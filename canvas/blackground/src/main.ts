@@ -8,10 +8,55 @@ class Blackboard{
     private height: number = el.height,
     private btns:HTMLDivElement = document.createElement('div'),
     private bgColor = "#000",
-    private lineColor = "#fff"
+    private lineColor = "#fff",
+    private lineWidth = 1
   ){
     this.initBlackboard();
     this.bindEvent();
+  }
+
+  // 截图
+  public short(){
+    const btn:HTMLButtonElement = document.createElement("button");
+    btn.innerText = "截图";
+    this.btns.insertAdjacentElement("afterbegin",btn);
+    const img = document.createElement("img");
+    btn.addEventListener("click",() => {
+      img.src = this.el.toDataURL("image/jpeg");
+      img.classList.add("short-img");
+    });
+    this.btns.insertAdjacentElement("afterend",img);
+    return this;
+  }
+
+  // 橡皮擦
+  public eraser(){
+    const btn:HTMLButtonElement = document.createElement("button");
+    btn.innerText = "橡皮擦";
+    this.btns.insertAdjacentElement("afterbegin",btn);
+    btn.addEventListener("click",() => {
+      this.lineColor = this.bgColor;
+      this.app.lineWidth = 10
+    });
+    return this;
+  }
+
+  // 改变线条粗细
+  public changeLinerWidth(){
+    const widths = [1,5,8,10,12,15];
+    const container = document.createElement('div');
+    container.classList.add("widthBox");
+    widths.forEach(width => {
+      const div = document.createElement("div");
+      div.innerText = `${width}`;
+      container.insertAdjacentElement("afterbegin",div);
+      div.addEventListener("click",() => {
+        this.lineWidth = width;
+        this.app.lineWidth = this.lineWidth;
+      })
+    });
+    this.btns.insertAdjacentElement("beforeend",container);
+    return this;
   }
 
   // 改变线条颜色
@@ -25,6 +70,7 @@ class Blackboard{
       container.insertAdjacentElement("afterbegin",div);
       div.addEventListener("click",() => {
         this.lineColor = color;
+        this.app.lineWidth = this.lineWidth;
       })
     });
     this.btns.insertAdjacentElement("beforeend",container);
@@ -75,10 +121,11 @@ class Blackboard{
   private initBlackboard(){
     this.app.fillStyle = this.bgColor;
     this.app.fillRect(0,0,this.width,this.height);
+    this.app.lineWidth = this.lineWidth;
     this.btns.classList.add("btns");
     this.el.insertAdjacentElement("afterend",this.btns);
   }
 }
 
 const instance = new Blackboard();
-instance.clear().changeBgColor("#1abc9c").changeLinerColor();
+instance.clear().changeBgColor("#1abc9c").changeLinerColor().eraser().changeLinerWidth().short();
